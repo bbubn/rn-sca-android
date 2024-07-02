@@ -2,6 +2,9 @@ apply plugin: "com.android.application"
 apply plugin: "org.jetbrains.kotlin.android"
 apply plugin: "com.facebook.react"
 
+apply plugin: "kotlin-android"
+//apply plugin: "kotlin-android-extentions"
+
 /**
  * This is the configuration block to customize your React Native Android app.
  * By default you don't need to apply any configuration, just uncomment the lines you need.
@@ -76,7 +79,7 @@ android {
 
     namespace "com.gosoloappv1_rn73"
     defaultConfig {
-        applicationId "com.gosoloappv1_rn73"
+        applicationId "net.gosolo.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
@@ -108,6 +111,11 @@ dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
     implementation("com.facebook.react:flipper-integration")
+
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.21")
+
+		// Adyen auth
+    implementation "com.adyen.authentication:android-authentication:0.2.1"
 
     if (hermesEnabled.toBoolean()) {
         implementation("com.facebook.react:hermes-android")

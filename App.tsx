@@ -15,14 +15,17 @@ import {
   Text,
   useColorScheme,
   View,
+	TouchableOpacity,
+	Button,
+	NativeModules
 } from 'react-native';
 
 import {
   Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
+  // DebugInstructions,
+  // Header,
+  // LearnMoreLinks,
+  // ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
 
 type SectionProps = PropsWithChildren<{
@@ -55,12 +58,41 @@ function Section({children, title}: SectionProps): React.JSX.Element {
   );
 }
 
-function App(): React.JSX.Element {
+function App(props): React.JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
 
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
+
+	const initAuth = async () => {
+		try {
+			// alert(Object.keys(console));
+			// console.log('NativeModules');
+			// console.log(Object.keys(NativeModules));
+			// console.warn(Object.keys(NativeModules));
+			// console.warn(Object.keys(NativeModules));
+			// console.trace(Object.keys(NativeModules));
+			// console.debug(Object.keys(NativeModules));
+
+			// console.warn(NativeModules.AdyenAuthentication ? 'yes' : 'no');
+
+			// return;
+			if (NativeModules.AdyenAuthentication) {
+				console.warn(Object.keys(NativeModules.AdyenAuthentication));
+				const s = await NativeModules.AdyenAuthentication.checkSupport();
+				console.log('result', s);
+				alert(s);
+			} else {
+				console.log('NO NativeModules.AdyenAuth');
+			}
+			// console.log(NativeModules.AdyenAuth ? 'Y' : 'N');
+		} catch (e) {
+			alert('CATCH Error initAuth')
+			console.log(e);
+			console.error('CATCH Error initAuth');
+		}
+	}
 
   return (
     <SafeAreaView style={backgroundStyle}>
@@ -71,25 +103,37 @@ function App(): React.JSX.Element {
       <ScrollView
         contentInsetAdjustmentBehavior="automatic"
         style={backgroundStyle}>
-        <Header />
         <View
           style={{
             backgroundColor: isDarkMode ? Colors.black : Colors.white,
           }}>
           <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
+            Run <Text style={styles.highlight}>initAuth</Text> to init NativeModules.AdyenAuthentication module.
           </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
+
+					<View style={styles.sectionContainer}>
+						{/*
+						<TouchableOpacity
+							style={styles.btn}
+							onPress={() => {alert('dsfsd')}}
+						>
+							<Text>Init Auth</Text>
+						</TouchableOpacity>
+						*/}
+						<Button
+							title="Auth"
+							// onPress={() => {alert('dsfsd')}}
+							onPress={initAuth}
+						/>
+						<View style={{marginTop: 20}} />
+						<Button
+							title="Test"
+							onPress={() => {
+								console.log(Object.values(props.images));
+
+							}}
+						/>
+					</View>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -113,6 +157,15 @@ const styles = StyleSheet.create({
   highlight: {
     fontWeight: '700',
   },
+	btn: {
+		display: 'flex',
+		flex: 1,
+		borderWidth: 1,
+		borderColor: 'grey',
+		padding: 10,
+		textAlign: 'center',
+		justifyConten: 'center'
+	}
 });
 
 export default App;
