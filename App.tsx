@@ -5,8 +5,8 @@
  * @format
  */
 
-import React from 'react';
-import type {PropsWithChildren} from 'react';
+import React, { useState } from 'react';
+import type { PropsWithChildren } from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -20,13 +20,8 @@ import {
 	NativeModules
 } from 'react-native';
 
-import {
-  Colors,
-  // DebugInstructions,
-  // Header,
-  // LearnMoreLinks,
-  // ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+import { Colors } from 'react-native/Libraries/NewAppScreen';
+import * as AdyenAuth from './adyen';
 
 type SectionProps = PropsWithChildren<{
   title: string;
@@ -59,39 +54,63 @@ function Section({children, title}: SectionProps): React.JSX.Element {
 }
 
 function App(props): React.JSX.Element {
+	const [error, setError] = useState(null);
+	const [deviceId, setDeviceId] = useState('');
+	const [isRegistred, setIsRegistredDeviceId] = useState(-1);
+	const [registrationResult, setRegistrationResult] = useState();
   const isDarkMode = useColorScheme() === 'dark';
-
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
 
 	const initAuth = async () => {
+		console.log('initAuth start', new Date());
 		try {
-			// alert(Object.keys(console));
-			// console.log('NativeModules');
-			// console.log(Object.keys(NativeModules));
-			// console.warn(Object.keys(NativeModules));
-			// console.warn(Object.keys(NativeModules));
-			// console.trace(Object.keys(NativeModules));
-			// console.debug(Object.keys(NativeModules));
-
-			// console.warn(NativeModules.AdyenAuthentication ? 'yes' : 'no');
-
-			// return;
-			if (NativeModules.AdyenAuthentication) {
-				console.warn(Object.keys(NativeModules.AdyenAuthentication));
-				const s = await NativeModules.AdyenAuthentication.checkSupport();
-				console.log('result', s);
-				alert(s);
-			} else {
-				console.log('NO NativeModules.AdyenAuth');
-			}
-			// console.log(NativeModules.AdyenAuth ? 'Y' : 'N');
+			const deviceId = await AdyenAuth.checkAvailability();
+			console.log('deviceId', deviceId);
+			setDeviceId(deviceId);
 		} catch (e) {
-			alert('CATCH Error initAuth')
+			setError(e);
 			console.log(e);
-			console.error('CATCH Error initAuth');
+			// console.error('CATCH Error initAuth');
 		}
+		console.log('initAuth finish', new Date());
+	}
+
+	const checkIsRegistred = async () => {
+		console.log('checkIsRegistred start', new Date());
+		try {
+			const result = await AdyenAuth.isDeviceRegistered(deviceId);
+			setIsRegistredDeviceId(result ? 1 : 0);
+		} catch (e) {
+			setError(e);
+			console.log(e);
+			// console.error('CATCH Error checkIsRegistred');
+		}
+		console.log('checkIsRegistred finish', new Date());
+	}
+
+	const deviceRegistration = async () => {
+		console.log('checkIsRegistred start', new Date());
+		try {
+			const serverResult = await AdyenAuth.registerDeviceRequest(deviceId);
+			console.log('serverResult', serverResult);
+
+			if (!serverResult || !serverResult.sdkInput) {
+				throw Error(serverResult ? JSON.stringify(serverResult) : 'no_api_response');
+				return false;
+			}
+
+			const result = await AdyenAuth.register(serverResult.sdkInput);
+			console.log('RegistrationResult', result);
+
+			setRegistrationResult(result);
+		} catch (e) {
+			setError(e);
+			console.log(e);
+			// console.error('CATCH Error checkIsRegistred');
+		}
+		console.log('checkIsRegistred finish', new Date());
 	}
 
   return (
@@ -107,33 +126,71 @@ function App(props): React.JSX.Element {
           style={{
             backgroundColor: isDarkMode ? Colors.black : Colors.white,
           }}>
-          <Section title="Step One">
-            Run <Text style={styles.highlight}>initAuth</Text> to init NativeModules.AdyenAuthentication module.
+          <Section title="AdyenAuthentication">
+						{!deviceId ? (
+							<React.Fragment>
+							Let's do <Text style={styles.highlight}>checkAvailability</Text> to get <Text style={styles.highlight}>deviceId</Text>
+							</React.Fragment>
+						) : (
+							<React.Fragment>
+							<Text style={styles.highlight}>deviceId: </Text> {deviceId}
+							</React.Fragment>
+						)}
           </Section>
-
 					<View style={styles.sectionContainer}>
-						{/*
-						<TouchableOpacity
-							style={styles.btn}
-							onPress={() => {alert('dsfsd')}}
-						>
-							<Text>Init Auth</Text>
-						</TouchableOpacity>
-						*/}
 						<Button
-							title="Auth"
-							// onPress={() => {alert('dsfsd')}}
+							title="Check availability"
 							onPress={initAuth}
 						/>
-						<View style={{marginTop: 20}} />
-						<Button
-							title="Test"
-							onPress={() => {
-								console.log(Object.values(props.images));
-
-							}}
-						/>
+						<View style={{marginTop: 0}} />
 					</View>
+
+					{deviceId ?
+						<React.Fragment>
+							<Section title="Device registration">
+								{isRegistred === -1 ? (
+									<React.Fragment>
+									Let's do <Text style={styles.highlight}>isDeviceRegistered</Text>
+									</React.Fragment>
+								) : null}
+								{isRegistred === 0 ? (
+									<React.Fragment>
+									This device is <Text style={styles.highlight}>not registred</Text>
+									</React.Fragment>
+								) : null}
+								{isRegistred === 1 ? (
+									<React.Fragment>
+									This device already <Text style={styles.highlight}>registred</Text>
+									</React.Fragment>
+								) : null}
+		          </Section>
+							<View style={styles.sectionContainer}>
+								<Button
+									title="Check is device registered"
+									onPress={checkIsRegistred}
+								/>
+								<View style={{marginTop: 10}} />
+								{isRegistred === 0 ?
+									<Button
+									title="Register device"
+									onPress={deviceRegistration}
+									/>
+								: null}
+							</View>
+						</React.Fragment>
+					: null}
+
+					{registrationResult ?
+					<Section title="Registration results">
+						<Text>{registrationResult.toString()}</Text>
+					</Section>
+					: null}
+
+					{error ?
+					<Section title="Error">
+						<Text>{error.toString()}</Text>
+					</Section>
+					: null}
         </View>
       </ScrollView>
     </SafeAreaView>

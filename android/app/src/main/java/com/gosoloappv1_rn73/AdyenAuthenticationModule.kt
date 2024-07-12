@@ -80,6 +80,54 @@ class AdyenAuthenticationModule (reactContext: ReactApplicationContext) : ReactC
         }
     }
 
+    @ReactMethod
+    fun checkAvailability(promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                delay(1000)
+                promise.resolve("AdyenAuthintication.checkAvailability.result")
+            } catch (e: Exception) {
+                promise.reject("Error!", e)
+            }
+        }
+    }
+    @ReactMethod
+    fun isDeviceRegistered(input: String, promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                delay(2000)
+                promise.resolve(false)
+            } catch (e: Exception) {
+                promise.reject("Error!", e)
+            }
+        }
+    }
+
+    @ReactMethod
+    fun register(input: String, promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                delay(2000)
+                promise.resolve("+20000")
+            } catch (e: Exception) {
+                promise.reject("Error!", e)
+            }
+        }
+    }
+
+    @ReactMethod
+    fun authenticate(input: String, promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                delay(2000)
+                promise.resolve("+20000")
+            } catch (e: Exception) {
+                promise.reject("Error!", e)
+            }
+        }
+    }
+
+
 //    @ReactMethod
 //    fun doSomethingRequiringWindow() {
 //        // get access to current UI thread first
