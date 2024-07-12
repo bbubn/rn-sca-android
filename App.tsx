@@ -22,6 +22,17 @@ import {
 
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 import * as AdyenAuth from './adyen';
+import {
+        AdyenAvailabilityResult,
+        AvailableResult,
+        UnavailableResult,
+        AdyenAuthenticationResult,
+        ErrorAuthenticationResult,
+        SuccessfulRegistrationResult,
+        SuccessfulAuthenticationResult,
+        CanceledAuthenticationResult,
+        UnexpectedErrorAuthenticationResult,
+} from './types';
 
 type SectionProps = PropsWithChildren<{
   title: string;
@@ -66,9 +77,19 @@ function App(props): React.JSX.Element {
 	const initAuth = async () => {
 		console.log('initAuth start', new Date());
 		try {
-			const deviceId = await AdyenAuth.checkAvailability();
-			console.log('deviceId', deviceId);
-			setDeviceId(deviceId);
+			const result: AdyenAvailabilityResult = await AdyenAuth.checkAvailability();
+			switch(result.constructor) {
+                case AvailableResult:
+                    const deviceId = result.sdkOutput;
+                    console.log('deviceId', deviceId);
+                    setDeviceId(deviceId);
+                    break;
+                 case UnavailableResult:
+                    console.log('unavailable');
+                    break;
+                 default:
+                    console.log('undefined');
+            }
 		} catch (e) {
 			setError(e);
 			console.log(e);

@@ -114,8 +114,12 @@ dependencies {
 
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.21")
 
-		// Adyen auth
+    // Adyen auth
     implementation "com.adyen.authentication:android-authentication:0.2.1"
+
+    // Androidx lifecycle
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.3"
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.8.3"
 
     if (hermesEnabled.toBoolean()) {
         implementation("com.facebook.react:hermes-android")
