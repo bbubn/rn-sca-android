@@ -26,16 +26,6 @@ class MainActivity : ReactActivity() {
   override fun createReactActivityDelegate(): ReactActivityDelegate =
       DefaultReactActivityDelegate(this, mainComponentName, fabricEnabled)
 
-//  override fun createReactActivityDelegate(): ReactActivityDelegate {
-//    return object : ReactActivityDelegate(this, mainComponentName) {
-//      override fun getLaunchOptions(): Bundle {
-//        val imageList = arrayListOf("https://dummyimage.com/600x400/ffffff/000000.png", "https://dummyimage.com/600x400/000000/ffffff.png")
-//        val initialProperties = Bundle().apply { putStringArrayList("images", imageList) }
-//        return initialProperties
-//      }
-//    }
-//  }
-
   override fun onCreate(savedInstanceState: Bundle?) {
     adyenAuthentication = AdyenAuthentication(this)
     super.onCreate(savedInstanceState)
